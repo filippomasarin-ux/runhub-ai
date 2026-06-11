@@ -14,7 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attivita: {
+        Row: {
+          calorie: number | null
+          created_at: string | null
+          data: string
+          distanza_km: number | null
+          durata_min: number | null
+          fc_media: number | null
+          fonte: string | null
+          id: string
+          note_utente: string | null
+          pace_media: string | null
+          rpe: number | null
+          sport_type: string | null
+          strava_activity_id: string | null
+          user_id: string
+        }
+        Insert: {
+          calorie?: number | null
+          created_at?: string | null
+          data: string
+          distanza_km?: number | null
+          durata_min?: number | null
+          fc_media?: number | null
+          fonte?: string | null
+          id?: string
+          note_utente?: string | null
+          pace_media?: string | null
+          rpe?: number | null
+          sport_type?: string | null
+          strava_activity_id?: string | null
+          user_id: string
+        }
+        Update: {
+          calorie?: number | null
+          created_at?: string | null
+          data?: string
+          distanza_km?: number | null
+          durata_min?: number | null
+          fc_media?: number | null
+          fonte?: string | null
+          id?: string
+          note_utente?: string | null
+          pace_media?: string | null
+          rpe?: number | null
+          sport_type?: string | null
+          strava_activity_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attivita_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          anni_esperienza: number | null
+          club_id: string | null
+          created_at: string | null
+          email: string | null
+          eta: number | null
+          giorni_disponibili: string[] | null
+          id: string
+          limitazioni_fisiche: string | null
+          nome: string | null
+          obiettivo_dettaglio: string | null
+          obiettivo_tipo: string | null
+          onboarding_completato: boolean | null
+          ruolo: string | null
+          sport_primario: string | null
+          sport_secondari: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          anni_esperienza?: number | null
+          club_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          eta?: number | null
+          giorni_disponibili?: string[] | null
+          id: string
+          limitazioni_fisiche?: string | null
+          nome?: string | null
+          obiettivo_dettaglio?: string | null
+          obiettivo_tipo?: string | null
+          onboarding_completato?: boolean | null
+          ruolo?: string | null
+          sport_primario?: string | null
+          sport_secondari?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          anni_esperienza?: number | null
+          club_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          eta?: number | null
+          giorni_disponibili?: string[] | null
+          id?: string
+          limitazioni_fisiche?: string | null
+          nome?: string | null
+          obiettivo_dettaglio?: string | null
+          obiettivo_tipo?: string | null
+          onboarding_completato?: boolean | null
+          ruolo?: string | null
+          sport_primario?: string | null
+          sport_secondari?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
