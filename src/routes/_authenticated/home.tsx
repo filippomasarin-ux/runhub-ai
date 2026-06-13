@@ -164,6 +164,9 @@ function HomePage() {
               )}
             </section>
 
+            <WeeklyPlanCard />
+
+
             <a
               href="/coach"
               className="block rounded-2xl border border-border bg-surface p-5 transition-all hover:border-ring hover:shadow-card"
