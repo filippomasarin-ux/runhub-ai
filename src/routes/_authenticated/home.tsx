@@ -7,6 +7,7 @@ import { SportDot } from "@/components/SportChip";
 import { sportInfo } from "@/lib/sports";
 import { AddActivityDialog } from "@/components/AddActivityDialog";
 import { toast } from "sonner";
+import { WeeklyPlanCard } from "@/components/WeeklyPlanCard";
 
 export const Route = createFileRoute("/_authenticated/home")({
   ssr: false,
