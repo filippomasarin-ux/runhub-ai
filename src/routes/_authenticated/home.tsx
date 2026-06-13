@@ -7,6 +7,7 @@ import { SportDot } from "@/components/SportChip";
 import { sportInfo } from "@/lib/sports";
 import { AddActivityDialog } from "@/components/AddActivityDialog";
 import { toast } from "sonner";
+import { WeeklyPlanCard } from "@/components/WeeklyPlanCard";
 
 export const Route = createFileRoute("/_authenticated/home")({
   ssr: false,
@@ -109,6 +110,8 @@ function HomePage() {
                 <Stat label="Ultima" value={attivita[0] ? formatRelDay(attivita[0].data) : "—"} sub="attività" />
               </div>
             </section>
+
+            <WeeklyPlanCard />
 
             <section className="rounded-2xl bg-surface p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
