@@ -197,6 +197,36 @@ export type Database = {
         }
         Relationships: []
       }
+      piani_settimanali: {
+        Row: {
+          created_at: string
+          giorni: Json
+          id: string
+          note: string | null
+          settimana_inizio: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          giorni: Json
+          id?: string
+          note?: string | null
+          settimana_inizio: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          giorni?: Json
+          id?: string
+          note?: string | null
+          settimana_inizio?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           anni_esperienza: number | null
