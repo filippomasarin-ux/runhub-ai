@@ -17,7 +17,7 @@ export function WeeklyPlanCard() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchPiano({})
+    fetchPiano()
       .then((p) => setPiano(p as Piano | null))
       .finally(() => setLoading(false));
   }, [fetchPiano]);
@@ -25,7 +25,7 @@ export function WeeklyPlanCard() {
   const handleGenerate = async () => {
     setGenerating(true);
     try {
-      const p = await genPiano({});
+      const p = await genPiano();
       setPiano(p as Piano);
       toast.success("Piano generato");
     } catch (e) {
