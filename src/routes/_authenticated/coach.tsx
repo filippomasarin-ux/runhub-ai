@@ -7,6 +7,10 @@ import { ArrowUp, Sparkles, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { WeeklyPlanCard } from "@/components/WeeklyPlanCard";
+import { useServerFn } from "@tanstack/react-start";
+import { getAttivitaAnalytics } from "@/lib/attivita.functions";
+import type { AttivitaForAnalytics } from "@/lib/analytics";
 
 export const Route = createFileRoute("/_authenticated/coach")({
   ssr: false,
@@ -23,9 +27,11 @@ const SUGGESTIONS = [
 function CoachPage() {
   const [token, setToken] = useState<string | null>(null);
   const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(null);
+  const [analytics, setAnalytics] = useState<AttivitaForAnalytics[] | undefined>(undefined);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fetchAnalytics = useServerFn(getAttivitaAnalytics);
 
   useEffect(() => {
     (async () => {
@@ -33,12 +39,15 @@ function CoachPage() {
       const t = data.session?.access_token ?? null;
       setToken(t);
 
-      const { data: rows } = await supabase
-        .from("coach_messages")
-        .select("id, role, content, parts, created_at")
-        .order("created_at", { ascending: true });
+      const [rows, an] = await Promise.all([
+        supabase
+          .from("coach_messages")
+          .select("id, role, content, parts, created_at")
+          .order("created_at", { ascending: true }),
+        fetchAnalytics().catch(() => [] as AttivitaForAnalytics[]),
+      ]);
 
-      const msgs: UIMessage[] = (rows ?? []).map((r) => ({
+      const msgs: UIMessage[] = (rows.data ?? []).map((r) => ({
         id: r.id,
         role: r.role as "user" | "assistant",
         parts: Array.isArray(r.parts)
@@ -46,8 +55,9 @@ function CoachPage() {
           : [{ type: "text", text: r.content ?? "" }],
       }));
       setInitialMessages(msgs);
+      setAnalytics(an as AttivitaForAnalytics[]);
     })();
-  }, []);
+  }, [fetchAnalytics]);
 
   const transport = useMemo(
     () =>
@@ -74,6 +84,7 @@ function CoachPage() {
     <CoachChat
       transport={transport}
       initialMessages={initialMessages}
+      analytics={analytics}
       input={input}
       setInput={setInput}
       scrollRef={scrollRef}
@@ -85,6 +96,7 @@ function CoachPage() {
 function CoachChat({
   transport,
   initialMessages,
+  analytics,
   input,
   setInput,
   scrollRef,
@@ -92,6 +104,7 @@ function CoachChat({
 }: {
   transport: DefaultChatTransport<UIMessage>;
   initialMessages: UIMessage[];
+  analytics: AttivitaForAnalytics[] | undefined;
   input: string;
   setInput: (v: string) => void;
   scrollRef: React.RefObject<HTMLDivElement | null>;
@@ -156,6 +169,10 @@ function CoachChat({
         </header>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-6 pb-32 md:pb-6">
+          <div className="mx-auto max-w-2xl mb-4">
+            <WeeklyPlanCard attivita={analytics} />
+          </div>
+
           {isEmpty ? (
             <EmptyState onPick={submit} />
           ) : (

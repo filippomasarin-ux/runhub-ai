@@ -16,7 +16,7 @@ type FormState = {
   anni_esperienza: number;
   sport_secondari: SportKey[];
   sport_primario: SportKey | "";
-  obiettivo_tipo: string;
+  obiettivi: string[];
   obiettivo_dettaglio: string;
   giorni_disponibili: string[];
   giorni_count: number;
@@ -36,7 +36,7 @@ function OnboardingPage() {
     anni_esperienza: 1,
     sport_secondari: [],
     sport_primario: "",
-    obiettivo_tipo: "",
+    obiettivi: [],
     obiettivo_dettaglio: "",
     giorni_disponibili: [],
     giorni_count: 3,
@@ -82,12 +82,21 @@ function OnboardingPage() {
     }));
   };
 
+  const toggleObiettivo = (key: string) => {
+    setForm((f) => ({
+      ...f,
+      obiettivi: f.obiettivi.includes(key)
+        ? f.obiettivi.filter((x) => x !== key)
+        : [...f.obiettivi, key],
+    }));
+  };
+
   const canNext = (() => {
     if (step === 1) return form.nome.trim().length > 0 && Number(form.eta) > 0;
     if (step === 2) return form.sport_secondari.length > 0 && form.sport_primario !== "";
     if (step === 3) {
-      if (!form.obiettivo_tipo) return false;
-      if (form.obiettivo_tipo === "gara") return form.obiettivo_dettaglio.trim().length > 0;
+      if (form.obiettivi.length === 0) return false;
+      if (form.obiettivi.includes("gara")) return form.obiettivo_dettaglio.trim().length > 0;
       return true;
     }
     if (step === 4) return form.giorni_disponibili.length > 0;
@@ -105,7 +114,8 @@ function OnboardingPage() {
         anni_esperienza: form.anni_esperienza,
         sport_primario: form.sport_primario,
         sport_secondari: form.sport_secondari,
-        obiettivo_tipo: form.obiettivo_tipo,
+        obiettivo_tipo: form.obiettivi[0] ?? null,
+        obiettivi: form.obiettivi,
         obiettivo_dettaglio: form.obiettivo_dettaglio || null,
         giorni_disponibili: form.giorni_disponibili,
         limitazioni_fisiche: form.limitazioni_fisiche || null,
@@ -235,13 +245,15 @@ function OnboardingPage() {
               <p className="mt-1 text-sm text-muted-foreground">Cosa vuoi raggiungere con RunHub AI?</p>
             </div>
 
+            <p className="text-xs text-muted-foreground">Puoi selezionarne più di uno.</p>
+
             <div className="space-y-3">
               {OBIETTIVI.map((o) => {
-                const selected = form.obiettivo_tipo === o.key;
+                const selected = form.obiettivi.includes(o.key);
                 const Icon = o.icon;
                 return (
                   <button
-                    key={o.key} type="button" onClick={() => update("obiettivo_tipo", o.key)}
+                    key={o.key} type="button" onClick={() => toggleObiettivo(o.key)}
                     className="flex w-full items-start gap-4 rounded-xl border-2 bg-surface p-4 text-left transition-all"
                     style={{ borderColor: selected ? "var(--color-accent)" : "var(--color-border)" }}
                   >
@@ -255,12 +267,15 @@ function OnboardingPage() {
                       <div className="font-semibold">{o.titolo}</div>
                       <div className="mt-0.5 text-sm text-muted-foreground">{o.desc}</div>
                     </div>
+                    {selected && (
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-accent-foreground" style={{ backgroundColor: "var(--color-accent)" }}>✓</span>
+                    )}
                   </button>
                 );
               })}
             </div>
 
-            {form.obiettivo_tipo === "gara" && (
+            {form.obiettivi.includes("gara") && (
               <Field label="Quale gara?">
                 <input
                   type="text" value={form.obiettivo_dettaglio}
@@ -346,8 +361,10 @@ function OnboardingPage() {
             <div className="rounded-xl bg-[oklch(0.97_0.02_175)] p-5 text-sm">
               <div className="font-semibold text-foreground">Benvenuto, {form.nome.split(" ")[0] || "atleta"}.</div>
               <p className="mt-1 text-muted-foreground">
-                Hai impostato {form.giorni_count} giorni di allenamento per
-                {" "}{OBIETTIVI.find((o) => o.key === form.obiettivo_tipo)?.titolo.toLowerCase()}.
+                Hai impostato {form.giorni_count} giorni di allenamento con{" "}
+                {form.obiettivi.length === 1
+                  ? OBIETTIVI.find((o) => o.key === form.obiettivi[0])?.titolo.toLowerCase()
+                  : `${form.obiettivi.length} obiettivi`}{" "}come focus principale.
               </p>
             </div>
           </section>
