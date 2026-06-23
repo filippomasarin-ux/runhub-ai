@@ -89,138 +89,131 @@ function HomePage() {
     <AppShell>
       <HomeHeader name={profile?.nome?.split(" ")[0] ?? null} />
 
-      <div className="space-y-4 px-5 pb-8" style={{ animation: "fade-up 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) both" }}>
+      <div className="px-5 pb-8 md:px-0" style={{ animation: "fade-up 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) both" }}>
         {loading ? (
-          <div className="space-y-4">
-            <Skeleton h={160} /> <Skeleton h={120} /> <Skeleton h={240} />
+          <div className="grid gap-4 md:grid-cols-2">
+            <Skeleton h={160} /> <Skeleton h={120} /> <Skeleton h={240} /> <Skeleton h={260} />
           </div>
         ) : (
           <>
-            <section className="rounded-2xl bg-surface p-5 shadow-card">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="label-caps text-muted-foreground">Come stai oggi</p>
-                  <div className="mt-1 flex items-center gap-2">
-                    <span
-                      aria-hidden
-                      className="inline-block h-2.5 w-2.5 rounded-full"
-                      style={{ backgroundColor: stato.color }}
-                    />
-                    <span className="text-xl font-semibold">{stato.label}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{stato.message}</p>
-                </div>
-              </div>
-
-              <div className="mt-5 grid grid-cols-3 gap-3 border-t border-border pt-4">
-                <Stat label="Attività" value={`${settimana.length}`} sub="questa settimana" />
-                <Stat label="Km totali" value={kmSettimana ? kmSettimana.toFixed(1) : "—"} sub="settimanali" />
-                <Stat label="Ultima" value={attivita[0] ? formatRelDay(attivita[0].data) : "—"} sub="attività" />
-              </div>
-            </section>
-
-            {/* Analytics avanzate */}
-            {analytics === null ? (
+            {/* Desktop: 2-column grid — Left column: status + activities + coach. Right: analytics + plan */}
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Left column */}
               <div className="space-y-4">
-                <Skeleton h={220} /> <Skeleton h={240} /> <Skeleton h={260} />
+                <section className="rounded-2xl bg-surface p-5 shadow-card">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="label-caps text-muted-foreground">Come stai oggi</p>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span
+                          aria-hidden
+                          className="inline-block h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: stato.color }}
+                        />
+                        <span className="text-xl font-semibold">{stato.label}</span>
+                      </div>
+                      <p className="mt-2 text-sm text-muted-foreground">{stato.message}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-3 gap-3 border-t border-border pt-4">
+                    <Stat label="Attività" value={`${settimana.length}`} sub="questa settimana" />
+                    <Stat label="Km totali" value={kmSettimana ? kmSettimana.toFixed(1) : "—"} sub="settimanali" />
+                    <Stat label="Ultima" value={attivita[0] ? formatRelDay(attivita[0].data) : "—"} sub="attività" />
+                  </div>
+                </section>
+
+                <section className="rounded-2xl bg-surface p-5 shadow-card">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h2 className="text-base font-semibold">Ultime attività</h2>
+                    {attivita.length > 3 && (
+                      <span className="text-xs text-muted-foreground">{attivita.length} totali</span>
+                    )}
+                  </div>
+
+                  {attivita.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-border py-10 text-center">
+                      <p className="text-sm text-muted-foreground">Nessuna attività ancora.</p>
+                      <button
+                        onClick={() => setAddOpen(true)}
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Aggiungi la prima
+                      </button>
+                    </div>
+                  ) : (
+                    <ul className="divide-y divide-border">
+                      {attivita.slice(0, 5).map((a) => {
+                        const info = sportInfo(a.sport_type);
+                        return (
+                          <li key={a.id} className="flex items-center gap-3 py-3">
+                            <SportDot sport={a.sport_type ?? undefined} size={10} />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-baseline justify-between gap-2">
+                                <span className="truncate text-sm font-medium">{info.label}</span>
+                                <span className="text-xs text-muted-foreground">{formatRelDay(a.data)}</span>
+                              </div>
+                              <div className="mt-0.5 text-xs text-muted-foreground">
+                                {a.distanza_km ? `${a.distanza_km.toFixed(1)} km · ` : ""}{a.durata_min ?? "?"} min
+                              </div>
+                            </div>
+                            {a.rpe ? (
+                              <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold">
+                                RPE {a.rpe}
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => setEditRpe({ id: a.id, value: 6 })}
+                                className="rounded-full border border-input px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
+                              >
+                                + RPE
+                              </button>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </section>
+
+                <a
+                  href="/coach"
+                  className="group block rounded-2xl p-px transition-all duration-300"
+                  style={{ background: "linear-gradient(135deg, oklch(0.66 0.28 295 / 60%) 0%, oklch(0.66 0.28 295 / 20%) 50%, oklch(1 0 0 / 8%) 100%)" }}
+                >
+                  <div className="flex items-center gap-4 rounded-2xl p-5 transition-all duration-300"
+                    style={{ background: "linear-gradient(135deg, oklch(0.14 0.04 295) 0%, oklch(0.11 0.025 295) 100%)" }}>
+                    <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent-foreground transition-transform duration-300 group-hover:scale-110"
+                      style={{ background: "linear-gradient(135deg, oklch(0.66 0.28 295) 0%, oklch(0.55 0.24 310) 100%)", boxShadow: "0 0 16px oklch(0.66 0.28 295 / 50%)" }}>
+                      <CoachSparkle />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold tracking-tight">Coach AI</p>
+                      <p className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>Piani · Recupero · Analisi · Nutrizione</p>
+                    </div>
+                    <span className="text-sm font-medium transition-transform duration-200 group-hover:translate-x-1" style={{ color: "var(--color-accent)" }}>→</span>
+                  </div>
+                </a>
               </div>
-            ) : (
-              <>
-                <TrainingLoadCard attivita={analytics} />
-                <VolumeCard attivita={analytics} />
-                <AerobicoCard attivita={analytics} />
-              </>
-            )}
 
-            <section className="rounded-2xl bg-surface p-5 shadow-card">
-
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-base font-semibold">Ultime attività</h2>
-                {attivita.length > 3 && (
-                  <span className="text-xs text-muted-foreground">{attivita.length} totali</span>
+              {/* Right column: analytics + piano */}
+              <div className="space-y-4">
+                {analytics === null ? (
+                  <>
+                    <Skeleton h={220} />
+                    <Skeleton h={240} />
+                    <Skeleton h={260} />
+                  </>
+                ) : (
+                  <>
+                    <TrainingLoadCard attivita={analytics} />
+                    <VolumeCard attivita={analytics} />
+                    <AerobicoCard attivita={analytics} />
+                    <WeeklyPlanCard attivita={analytics} />
+                  </>
                 )}
               </div>
-
-              {attivita.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border py-10 text-center">
-                  <p className="text-sm text-muted-foreground">Nessuna attività ancora.</p>
-                  <button
-                    onClick={() => setAddOpen(true)}
-                    className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Aggiungi la prima
-                  </button>
-                </div>
-              ) : (
-                <ul className="divide-y divide-border">
-                  {attivita.slice(0, 5).map((a) => {
-                    const info = sportInfo(a.sport_type);
-                    return (
-                      <li key={a.id} className="flex items-center gap-3 py-3">
-                        <SportDot sport={a.sport_type ?? undefined} size={10} />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-baseline justify-between gap-2">
-                            <span className="truncate text-sm font-medium">{info.label}</span>
-                            <span className="text-xs text-muted-foreground">{formatRelDay(a.data)}</span>
-                          </div>
-                          <div className="mt-0.5 text-xs text-muted-foreground">
-                            {a.distanza_km ? `${a.distanza_km.toFixed(1)} km · ` : ""}{a.durata_min ?? "?"} min
-                          </div>
-                        </div>
-                        {a.rpe ? (
-                          <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold">
-                            RPE {a.rpe}
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => setEditRpe({ id: a.id, value: 6 })}
-                            className="rounded-full border border-input px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
-                          >
-                            + RPE
-                          </button>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </section>
-
-            <WeeklyPlanCard attivita={analytics ?? undefined} />
-
-
-            <a
-              href="/coach"
-              className="group block rounded-2xl p-px transition-all duration-300"
-              style={{
-                background: "linear-gradient(135deg, oklch(0.66 0.28 295 / 60%) 0%, oklch(0.66 0.28 295 / 20%) 50%, oklch(1 0 0 / 8%) 100%)",
-              }}
-            >
-              <div
-                className="flex items-center gap-4 rounded-2xl p-5 transition-all duration-300"
-                style={{
-                  background: "linear-gradient(135deg, oklch(0.14 0.04 295) 0%, oklch(0.11 0.025 295) 100%)",
-                }}
-              >
-                <div
-                  className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent-foreground transition-transform duration-300 group-hover:scale-110"
-                  style={{
-                    background: "linear-gradient(135deg, oklch(0.66 0.28 295) 0%, oklch(0.55 0.24 310) 100%)",
-                    boxShadow: "0 0 16px oklch(0.66 0.28 295 / 50%)",
-                  }}
-                >
-                  <CoachSparkle />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-bold tracking-tight">Coach AI</p>
-                  <p className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>Piani · Recupero · Analisi · Nutrizione</p>
-                </div>
-                <span
-                  className="text-sm font-medium transition-transform duration-200 group-hover:translate-x-1"
-                  style={{ color: "var(--color-accent)" }}
-                >→</span>
-              </div>
-            </a>
+            </div>
           </>
         )}
       </div>
@@ -329,7 +322,7 @@ function getGreeting() {
 function HomeHeader({ name }: { name: string | null }) {
   const { text, sub } = getGreeting();
   return (
-    <header className="relative overflow-hidden px-5 pt-8 pb-6">
+    <header className="relative overflow-hidden px-5 pt-8 pb-6 md:px-0">
       {/* Ambient glow */}
       <div
         aria-hidden
