@@ -155,7 +155,27 @@ export function WeeklyPlanCard({ attivita }: { attivita?: AttivitaForAnalytics[]
         >
           {carico.label}
         </span>
+        {tsbData && (
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
+            style={{ background: tsbData.col.bg, color: tsbData.col.text }}
+            title="Training Stress Balance: bilanciamento forma/carico"
+          >
+            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: tsbData.col.dot }} />
+            TSB {tsbData.tsb > 0 ? "+" : ""}{tsbData.tsb.toFixed(0)} · {tsbData.info.label}
+          </span>
+        )}
       </div>
+
+      {warningCarico && (
+        <div
+          className="mb-3 flex items-start gap-2 rounded-lg border px-3 py-2 text-[11px]"
+          style={{ borderColor: "rgba(234,179,8,0.4)", background: "rgba(234,179,8,0.08)", color: "#a16207" }}
+        >
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>{warningCarico}</span>
+        </div>
+      )}
 
       {/* Calendar strip */}
       <div className="grid grid-cols-7 gap-1.5">
