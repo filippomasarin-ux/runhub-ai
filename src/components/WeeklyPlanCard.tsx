@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles, RefreshCw, Moon, Clock, Flame, MapPin, Activity } from "lucide-react";
+import { Sparkles, RefreshCw, Moon, Clock, Flame, MapPin, Activity, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { generaPianoSettimanale, getPianoCorrente, type PianoSettimanale } from "@/lib/piani.functions";
 import { sportInfo } from "@/lib/sports";
+import { calcolaCarico, labelTsb, TSB_COLORI, type AttivitaForAnalytics } from "@/lib/analytics";
 
 type Piano = PianoSettimanale & { settimana_inizio: string };
 
