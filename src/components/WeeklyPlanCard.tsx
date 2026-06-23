@@ -105,6 +105,18 @@ export function WeeklyPlanCard({ attivita }: { attivita?: AttivitaForAnalytics[]
   const stato = STATO_STYLE[piano.stato_forma_rilevato] ?? STATO_STYLE.normale;
   const carico = CARICO_STYLE[piano.carico_settimana] ?? CARICO_STYLE.medio;
 
+  const tsbData = useMemo(() => {
+    if (!attivita || attivita.length === 0) return null;
+    const { tsb } = calcolaCarico(attivita);
+    const info = labelTsb(tsb);
+    return { tsb, info, col: TSB_COLORI[info.colore] };
+  }, [attivita]);
+
+  const warningCarico =
+    tsbData && tsbData.tsb < -10 && piano.stato_forma_rilevato === "fresco"
+      ? "Il tuo carico recente è elevato — segui il piano con attenzione."
+      : null;
+
   const totMinuti = piano.giorni.reduce((s, g) => s + (g.riposo ? 0 : g.durata_min ?? 0), 0);
   const totKm = piano.giorni.reduce((s, g) => s + (g.distanza_km ?? 0), 0);
   const sessioni = piano.giorni.filter((g) => !g.riposo).length;
