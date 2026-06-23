@@ -123,11 +123,24 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12">
+      {/* Background ambient orbs */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full opacity-15"
+          style={{ background: "radial-gradient(circle, oklch(0.66 0.28 295) 0%, transparent 70%)", animation: "breathe 8s ease-in-out infinite" }} />
+        <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full opacity-10"
+          style={{ background: "radial-gradient(circle, oklch(0.62 0.21 25) 0%, transparent 70%)", animation: "breathe 6s 2s ease-in-out infinite" }} />
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage: "linear-gradient(oklch(1 0 0) 1px, transparent 1px), linear-gradient(90deg, oklch(1 0 0) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }} />
+      </div>
+
+      <div className="relative w-full max-w-md" style={{ animation: "fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}>
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
           <Logo />
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm" style={{ color: "var(--color-muted-foreground)" }}>
             Il tuo coach personale, sempre con te.
           </p>
         </div>
@@ -211,3 +224,4 @@ function AuthPage() {
     </div>
   );
 }
+

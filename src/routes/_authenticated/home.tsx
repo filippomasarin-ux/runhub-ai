@@ -87,12 +87,9 @@ function HomePage() {
 
   return (
     <AppShell>
-      <header className="px-5 pt-8 pb-4">
-        <p className="label-caps text-muted-foreground">Ciao</p>
-        <h1 className="text-2xl">{profile?.nome?.split(" ")[0] ?? "Atleta"}</h1>
-      </header>
+      <HomeHeader name={profile?.nome?.split(" ")[0] ?? null} />
 
-      <div className="space-y-4 px-5 pb-8">
+      <div className="space-y-4 px-5 pb-8" style={{ animation: "fade-up 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) both" }}>
         {loading ? (
           <div className="space-y-4">
             <Skeleton h={160} /> <Skeleton h={120} /> <Skeleton h={240} />
@@ -194,20 +191,34 @@ function HomePage() {
 
             <a
               href="/coach"
-              className="block rounded-2xl border border-border bg-surface p-5 transition-all hover:border-ring hover:shadow-card"
+              className="group block rounded-2xl p-px transition-all duration-300"
+              style={{
+                background: "linear-gradient(135deg, oklch(0.66 0.28 295 / 60%) 0%, oklch(0.66 0.28 295 / 20%) 50%, oklch(1 0 0 / 8%) 100%)",
+              }}
             >
-              <div className="flex items-center gap-3">
+              <div
+                className="flex items-center gap-4 rounded-2xl p-5 transition-all duration-300"
+                style={{
+                  background: "linear-gradient(135deg, oklch(0.14 0.04 295) 0%, oklch(0.11 0.025 295) 100%)",
+                }}
+              >
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full text-accent-foreground"
-                  style={{ backgroundColor: "var(--color-accent)" }}
+                  className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent-foreground transition-transform duration-300 group-hover:scale-110"
+                  style={{
+                    background: "linear-gradient(135deg, oklch(0.66 0.28 295) 0%, oklch(0.55 0.24 310) 100%)",
+                    boxShadow: "0 0 16px oklch(0.66 0.28 295 / 50%)",
+                  }}
                 >
                   <CoachSparkle />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold">Chiedi al Coach AI</p>
-                  <p className="text-xs text-muted-foreground">Piani, recupero, nutrizione, analisi</p>
+                  <p className="text-sm font-bold tracking-tight">Coach AI</p>
+                  <p className="text-xs" style={{ color: "var(--color-muted-foreground)" }}>Piani · Recupero · Analisi · Nutrizione</p>
                 </div>
-                <span className="text-muted-foreground">→</span>
+                <span
+                  className="text-sm font-medium transition-transform duration-200 group-hover:translate-x-1"
+                  style={{ color: "var(--color-accent)" }}
+                >→</span>
               </div>
             </a>
           </>
@@ -304,4 +315,47 @@ function formatRelDay(iso: string) {
   if (days === 1) return "Ieri";
   if (days < 7) return `${days}g fa`;
   return d.toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+}
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 5)  return { text: "Notte fonda", sub: "Riposa — il corpo cresce mentre dormi." };
+  if (h < 12) return { text: "Buongiorno", sub: "La sessione mattutina brucia il 20% in più." };
+  if (h < 17) return { text: "Buon pomeriggio", sub: "Il picco di forza è tra le 14 e le 18." };
+  if (h < 21) return { text: "Buona sera", sub: "Ottimo momento per cardio o tecnica." };
+  return { text: "Buona notte", sub: "Pianifica il riposo: è parte dell'allenamento." };
+}
+
+function HomeHeader({ name }: { name: string | null }) {
+  const { text, sub } = getGreeting();
+  return (
+    <header className="relative overflow-hidden px-5 pt-8 pb-6">
+      {/* Ambient glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full opacity-20"
+        style={{
+          background: "radial-gradient(circle, oklch(0.66 0.28 295) 0%, transparent 70%)",
+          animation: "breathe 6s ease-in-out infinite",
+        }}
+      />
+      {/* Grid lines decoration */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: "linear-gradient(oklch(1 0 0) 1px, transparent 1px), linear-gradient(90deg, oklch(1 0 0) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div className="relative" style={{ animation: "fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}>
+        <p className="label-caps" style={{ color: "var(--color-accent)", letterSpacing: "0.1em" }}>{text}</p>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight">
+          {name ?? "Atleta"}
+        </h1>
+        <p className="mt-1 text-sm" style={{ color: "var(--color-muted-foreground)" }}>{sub}</p>
+      </div>
+    </header>
+  );
 }
