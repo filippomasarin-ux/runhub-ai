@@ -189,7 +189,7 @@ function HomePage() {
               )}
             </section>
 
-            <WeeklyPlanCard />
+            <WeeklyPlanCard attivita={analytics ?? undefined} />
 
 
             <a
