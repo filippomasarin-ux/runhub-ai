@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { Plus } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { SportDot } from "@/components/SportChip";
@@ -8,6 +9,11 @@ import { sportInfo } from "@/lib/sports";
 import { AddActivityDialog } from "@/components/AddActivityDialog";
 import { toast } from "sonner";
 import { WeeklyPlanCard } from "@/components/WeeklyPlanCard";
+import { TrainingLoadCard } from "@/components/TrainingLoadCard";
+import { VolumeCard } from "@/components/VolumeCard";
+import { AerobicoCard } from "@/components/AerobicoCard";
+import { getAttivitaAnalytics } from "@/lib/attivita.functions";
+import type { AttivitaForAnalytics } from "@/lib/analytics";
 
 export const Route = createFileRoute("/_authenticated/home")({
   ssr: false,
