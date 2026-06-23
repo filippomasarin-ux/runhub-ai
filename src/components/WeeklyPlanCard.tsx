@@ -32,7 +32,7 @@ function zonaColor(zona?: string): string {
   return "var(--color-muted-foreground)";
 }
 
-export function WeeklyPlanCard() {
+export function WeeklyPlanCard({ attivita }: { attivita?: AttivitaForAnalytics[] }) {
   const fetchPiano = useServerFn(getPianoCorrente);
   const genPiano = useServerFn(generaPianoSettimanale);
   const [piano, setPiano] = useState<Piano | null>(null);
