@@ -14,21 +14,22 @@ export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0 md:pl-60">
+    <div className="min-h-screen bg-background pb-20 md:pb-0 md:pl-56">
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 md:flex md:flex-col" style={{
-        background: "linear-gradient(180deg, oklch(0.12 0.028 295) 0%, oklch(0.09 0.022 295) 100%)",
-        borderRight: "1px solid oklch(1 0 0 / 7%)",
-      }}>
-        {/* Logo area */}
-        <div className="flex h-16 items-center px-6" style={{
-          borderBottom: "1px solid oklch(1 0 0 / 6%)",
-        }}>
+      <aside
+        className="fixed inset-y-0 left-0 z-20 hidden w-56 flex-col md:flex"
+        style={{
+          background: "oklch(0.09 0.02 295)",
+          borderRight: "1px solid oklch(1 0 0 / 6%)",
+        }}
+      >
+        {/* Logo */}
+        <div className="flex h-14 items-center px-5" style={{ borderBottom: "1px solid oklch(1 0 0 / 5%)" }}>
           <Link to="/home"><Logo /></Link>
         </div>
 
-        {/* Nav items */}
-        <nav className="flex flex-1 flex-col gap-0.5 px-3 py-4">
+        {/* Nav */}
+        <nav className="flex flex-1 flex-col gap-0.5 px-3 py-5">
           {tabs.map((t) => {
             const active = path === t.to || path.startsWith(t.to + "/");
             const Icon = t.icon;
@@ -36,33 +37,29 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 key={t.to}
                 to={t.to}
-                className="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200"
+                className="group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150"
                 style={
                   active
-                    ? {
-                        background: "linear-gradient(135deg, oklch(0.66 0.28 295 / 18%) 0%, oklch(0.66 0.28 295 / 8%) 100%)",
-                        color: "var(--color-foreground)",
-                        boxShadow: "inset 1px 0 0 oklch(0.66 0.28 295 / 60%)",
-                      }
-                    : { color: "var(--color-muted-foreground)" }
+                    ? { background: "oklch(0.66 0.28 295 / 12%)", color: "var(--color-foreground)" }
+                    : { color: "oklch(0.55 0.02 295)" }
                 }
               >
                 {active && (
                   <span
-                    className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r"
-                    style={{ background: "var(--color-accent)", boxShadow: "0 0 8px var(--color-accent)" }}
+                    className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full"
+                    style={{ background: "var(--color-accent)" }}
                   />
                 )}
                 <Icon
-                  className="h-4.5 w-4.5 transition-transform duration-200 group-hover:scale-110"
+                  size={16}
                   strokeWidth={active ? 2.5 : 1.8}
-                  style={{ color: active ? "var(--color-accent)" : "inherit" }}
+                  style={{ color: active ? "var(--color-accent)" : "inherit", flexShrink: 0 }}
                 />
-                <span style={{ color: active ? "var(--color-foreground)" : "inherit" }}>{t.label}</span>
-
+                <span className="tracking-wide" style={{ fontSize: 13 }}>{t.label}</span>
                 {!active && (
-                  <span className="absolute inset-0 rounded-xl opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-                    style={{ background: "oklch(1 0 0 / 4%)" }}
+                  <span
+                    className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-100 group-hover:opacity-100"
+                    style={{ background: "oklch(1 0 0 / 3.5%)" }}
                   />
                 )}
               </Link>
@@ -70,10 +67,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        {/* Bottom accent line */}
-        <div className="mx-4 mb-6 h-px" style={{
-          background: "linear-gradient(90deg, transparent, oklch(0.66 0.28 295 / 40%), transparent)",
-        }} />
+        <div
+          className="mx-4 mb-5 h-px"
+          style={{ background: "linear-gradient(90deg, transparent, oklch(0.66 0.28 295 / 30%), transparent)" }}
+        />
       </aside>
 
       <main className="mx-auto w-full max-w-2xl md:max-w-none md:px-6 lg:px-10">{children}</main>
@@ -82,13 +79,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       <nav
         className="fixed inset-x-0 bottom-0 z-20 md:hidden"
         style={{
-          background: "linear-gradient(180deg, oklch(0.10 0.025 295 / 0%) 0%, oklch(0.10 0.025 295 / 97%) 20%, oklch(0.10 0.025 295) 100%)",
-          backdropFilter: "blur(20px)",
+          background: "oklch(0.09 0.02 295 / 96%)",
+          backdropFilter: "blur(24px)",
+          borderTop: "1px solid oklch(1 0 0 / 7%)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
-          borderTop: "1px solid oklch(1 0 0 / 8%)",
         }}
       >
-        <div className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-2 pb-2">
+        <div className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-1.5 pb-2">
           {tabs.map((t) => {
             const active = path === t.to || path.startsWith(t.to + "/");
             const Icon = t.icon;
@@ -96,29 +93,26 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 key={t.to}
                 to={t.to}
-                className="group flex flex-1 flex-col items-center gap-1 py-1.5 text-[10px] font-semibold tracking-wide uppercase transition-all duration-200"
-                style={{ color: active ? "var(--color-foreground)" : "var(--color-muted-foreground)" }}
+                className="flex flex-1 flex-col items-center gap-1 py-1"
+                style={{ color: active ? "var(--color-foreground)" : "oklch(0.45 0.02 295)" }}
               >
                 <span
-                  className="relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200"
-                  style={active ? {
-                    background: "linear-gradient(135deg, oklch(0.66 0.28 295 / 25%) 0%, oklch(0.66 0.28 295 / 12%) 100%)",
-                    boxShadow: "0 0 12px oklch(0.66 0.28 295 / 30%), inset 0 1px 0 oklch(1 0 0 / 10%)",
-                  } : {}}
+                  className="relative flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150"
+                  style={
+                    active
+                      ? { background: "oklch(0.66 0.28 295 / 16%)" }
+                      : {}
+                  }
                 >
                   <Icon
-                    className="h-5 w-5 transition-transform duration-200 group-active:scale-90"
+                    size={18}
                     strokeWidth={active ? 2.5 : 1.8}
                     style={{ color: active ? "var(--color-accent)" : "inherit" }}
                   />
-                  {active && (
-                    <span
-                      className="absolute -bottom-0.5 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full"
-                      style={{ background: "var(--color-accent)", boxShadow: "0 0 6px var(--color-accent)" }}
-                    />
-                  )}
                 </span>
-                <span>{t.label}</span>
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  {t.label}
+                </span>
               </Link>
             );
           })}

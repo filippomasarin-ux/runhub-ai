@@ -12,6 +12,61 @@ export const Route = createFileRoute("/auth")({
 
 type Mode = "login" | "signup" | "email-sent";
 
+const inputClass = [
+  "w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors",
+  "placeholder:text-[oklch(0.38_0.02_290)]",
+].join(" ");
+
+const inputStyle = {
+  background: "oklch(0.07 0.015 295)",
+  borderColor: "oklch(1 0 0 / 8%)",
+  color: "var(--color-foreground)",
+};
+
+const inputFocusStyle = {
+  ...inputStyle,
+  borderColor: "oklch(0.66 0.28 295 / 60%)",
+  boxShadow: "0 0 0 3px oklch(0.66 0.28 295 / 12%)",
+};
+
+function Field({
+  label, type, value, onChange, placeholder, autoComplete, required, minLength,
+}: {
+  label: string;
+  type: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  autoComplete?: string;
+  required?: boolean;
+  minLength?: number;
+}) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <div>
+      <label
+        className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest"
+        style={{ color: "oklch(0.5 0.02 290)" }}
+      >
+        {label}
+      </label>
+      <input
+        type={type}
+        required={required}
+        minLength={minLength}
+        autoComplete={autoComplete}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className={inputClass}
+        style={focused ? inputFocusStyle : inputStyle}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
 function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("login");
@@ -86,36 +141,35 @@ function AuthPage() {
   if (mode === "email-sent") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="mb-8 flex flex-col items-center gap-3 text-center">
-            <Logo />
+        <div className="w-full max-w-sm text-center" style={{ animation: "fade-up 0.4s cubic-bezier(0.16,1,0.3,1) both" }}>
+          <div
+            className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl"
+            style={{ background: "oklch(0.66 0.28 295 / 14%)", border: "1px solid oklch(0.66 0.28 295 / 25%)" }}
+          >
+            <Mail size={26} style={{ color: "var(--color-accent)" }} />
           </div>
-          <div className="rounded-2xl bg-surface p-8 shadow-card text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full" style={{ background: "color-mix(in oklab, var(--color-accent) 15%, transparent)" }}>
-              <Mail className="h-6 w-6" style={{ color: "var(--color-accent)" }} />
-            </div>
-            <h2 className="text-lg font-semibold">Controlla la tua email</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Abbiamo inviato un link di conferma a{" "}
-              <span className="font-medium text-foreground">{email}</span>.
-              Clicca il link per attivare il tuo account.
-            </p>
+          <h2 className="text-2xl font-black tracking-tight">Controlla la email</h2>
+          <p className="mt-2 text-sm leading-relaxed" style={{ color: "oklch(0.55 0.02 290)" }}>
+            Link di conferma inviato a{" "}
+            <span className="font-semibold text-foreground">{email}</span>.
+          </p>
+          <button
+            onClick={handleResend}
+            disabled={resending}
+            className="mt-6 inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-all disabled:opacity-50"
+            style={{ borderColor: "oklch(1 0 0 / 10%)", color: "var(--color-foreground)", background: "oklch(0.115 0.025 295)" }}
+          >
+            {resending ? <RefreshCw size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+            Reinvia email
+          </button>
+          <div className="mt-4">
             <button
-              onClick={handleResend}
-              disabled={resending}
-              className="mt-6 inline-flex items-center gap-2 rounded-lg border border-input bg-surface px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
+              onClick={() => setMode("login")}
+              className="text-sm underline-offset-4 hover:underline"
+              style={{ color: "oklch(0.5 0.02 290)" }}
             >
-              {resending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-              Reinvia email
+              ← Torna al login
             </button>
-            <div className="mt-4">
-              <button
-                onClick={() => setMode("login")}
-                className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-              >
-                ← Torna al login
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -124,104 +178,98 @@ function AuthPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12">
-      {/* Background ambient orbs */}
+      {/* Ambient background */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full opacity-15"
-          style={{ background: "radial-gradient(circle, oklch(0.66 0.28 295) 0%, transparent 70%)", animation: "breathe 8s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full opacity-10"
-          style={{ background: "radial-gradient(circle, oklch(0.62 0.21 25) 0%, transparent 70%)", animation: "breathe 6s 2s ease-in-out infinite" }} />
-        <div className="absolute inset-0 opacity-[0.025]"
+        <div
+          className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full"
           style={{
-            backgroundImage: "linear-gradient(oklch(1 0 0) 1px, transparent 1px), linear-gradient(90deg, oklch(1 0 0) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }} />
+            background: "radial-gradient(circle, oklch(0.66 0.28 295 / 16%) 0%, transparent 65%)",
+            animation: "breathe 9s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute -bottom-20 -right-20 h-72 w-72 rounded-full"
+          style={{
+            background: "radial-gradient(circle, oklch(0.62 0.21 25 / 10%) 0%, transparent 65%)",
+            animation: "breathe 7s 2s ease-in-out infinite",
+          }}
+        />
       </div>
 
-      <div className="relative w-full max-w-md" style={{ animation: "fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}>
+      <div className="relative w-full max-w-sm" style={{ animation: "fade-up 0.45s cubic-bezier(0.16,1,0.3,1) both" }}>
+        {/* Logo + tagline */}
         <div className="mb-8 flex flex-col items-center gap-3 text-center">
           <Logo />
-          <p className="text-sm" style={{ color: "var(--color-muted-foreground)" }}>
+          <p className="text-sm" style={{ color: "oklch(0.5 0.02 290)" }}>
             Il tuo coach personale, sempre con te.
           </p>
         </div>
 
-        <div className="rounded-2xl bg-surface p-6 shadow-card sm:p-8">
-          <div className="mb-6 flex rounded-lg bg-muted p-1">
-            <button
-              type="button"
-              onClick={() => setMode("login")}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
-                mode === "login" ? "bg-surface text-foreground shadow-card" : "text-muted-foreground"
-              }`}
-            >
-              Accedi
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("signup")}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all ${
-                mode === "signup" ? "bg-surface text-foreground shadow-card" : "text-muted-foreground"
-              }`}
-            >
-              Registrati
-            </button>
+        {/* Card */}
+        <div
+          className="rounded-2xl p-7"
+          style={{
+            background: "oklch(0.10 0.022 295)",
+            border: "1px solid oklch(1 0 0 / 7%)",
+            boxShadow: "0 1px 0 oklch(1 0 0 / 5%) inset, 0 24px 60px oklch(0 0 0 / 50%)",
+          }}
+        >
+          {/* Tab switcher */}
+          <div
+            className="mb-6 flex rounded-xl p-1"
+            style={{ background: "oklch(0.07 0.015 295)" }}
+          >
+            {(["login", "signup"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                className="flex-1 rounded-lg py-2 text-sm font-semibold transition-all duration-150"
+                style={
+                  mode === m
+                    ? { background: "oklch(0.115 0.025 295)", color: "var(--color-foreground)", boxShadow: "0 1px 3px oklch(0 0 0 / 40%)" }
+                    : { color: "oklch(0.5 0.02 290)" }
+                }
+              >
+                {m === "login" ? "Accedi" : "Registrati"}
+              </button>
+            ))}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
-              <div>
-                <label className="label-caps mb-1.5 block text-muted-foreground">Nome</label>
-                <input
-                  type="text"
-                  required
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-surface px-3 py-2.5 text-[15px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
-                  placeholder="Come ti chiami?"
-                />
-              </div>
+              <Field label="Nome" type="text" required value={nome} onChange={setNome} placeholder="Come ti chiami?" />
             )}
-            <div>
-              <label className="label-caps mb-1.5 block text-muted-foreground">Email</label>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-input bg-surface px-3 py-2.5 text-[15px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
-                placeholder="tu@example.com"
-              />
-            </div>
-            <div>
-              <label className="label-caps mb-1.5 block text-muted-foreground">Password</label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-input bg-surface px-3 py-2.5 text-[15px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
-                placeholder="Almeno 6 caratteri"
-              />
-            </div>
+            <Field label="Email" type="email" required autoComplete="email" value={email} onChange={setEmail} placeholder="tu@example.com" />
+            <Field
+              label="Password"
+              type="password"
+              required
+              minLength={6}
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              value={password}
+              onChange={setPassword}
+              placeholder="Almeno 6 caratteri"
+            />
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="mt-2 w-full rounded-xl py-3 text-sm font-bold tracking-wide text-white transition-all duration-150 hover:brightness-110 disabled:opacity-50"
+              style={{
+                background: "oklch(0.66 0.28 295)",
+                boxShadow: "0 0 0 1px oklch(0.66 0.28 295 / 40%), 0 4px 20px oklch(0.66 0.28 295 / 35%)",
+              }}
             >
               {loading ? "Attendi…" : mode === "signup" ? "Crea account" : "Accedi"}
             </button>
           </form>
         </div>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        <p className="mt-5 text-center text-xs" style={{ color: "oklch(0.4 0.015 290)" }}>
           Continuando accetti i termini di servizio di RunHub AI.
         </p>
       </div>
     </div>
   );
 }
-

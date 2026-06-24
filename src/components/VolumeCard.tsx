@@ -35,9 +35,15 @@ export function VolumeCard({ attivita }: { attivita: AttivitaForAnalytics[] }) {
     : `${totaleCorrente.toFixed(1)} km`;
 
   return (
-    <section className="rounded-2xl bg-surface p-5 shadow-card">
+    <section
+      className="rounded-2xl p-5"
+      style={{
+        background: "oklch(0.115 0.025 295)",
+        boxShadow: "0 1px 0 oklch(1 0 0 / 5%) inset, 0 8px 24px oklch(0 0 0 / 40%)",
+      }}
+    >
       <div className="mb-1 flex items-center justify-between gap-2">
-        <h2 className="text-base font-semibold">Volume settimanale</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "oklch(0.6 0.02 290)" }}>Volume settimanale</h2>
         {haDistanza && (
           <div className="inline-flex rounded-full border border-border p-0.5 text-[11px]">
             {(["minuti", "km"] as const).map((opt) => (

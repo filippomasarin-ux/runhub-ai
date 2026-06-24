@@ -73,9 +73,9 @@ export function WeeklyPlanCard({ attivita }: { attivita?: AttivitaForAnalytics[]
 
   if (!piano) {
     return (
-      <section className="rounded-2xl bg-surface p-5 shadow-card">
+      <section className="rounded-2xl p-5" style={{ background: "oklch(0.115 0.025 295)", boxShadow: "0 1px 0 oklch(1 0 0 / 5%) inset, 0 8px 24px oklch(0 0 0 / 40%)" }}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-semibold">Piano settimanale</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "oklch(0.6 0.02 290)" }}>Piano settimanale</h2>
         </div>
         <div className="rounded-xl border border-dashed border-border py-10 text-center">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full" style={{ background: "var(--color-accent)" }}>
@@ -122,9 +122,9 @@ export function WeeklyPlanCard({ attivita }: { attivita?: AttivitaForAnalytics[]
   const sessioni = piano.giorni.filter((g) => !g.riposo).length;
 
   return (
-    <section className="rounded-2xl bg-surface p-5 shadow-card">
+    <section className="rounded-2xl p-5" style={{ background: "oklch(0.115 0.025 295)", boxShadow: "0 1px 0 oklch(1 0 0 / 5%) inset, 0 8px 24px oklch(0 0 0 / 40%)" }}>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-base font-semibold">Piano settimanale</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: "oklch(0.6 0.02 290)" }}>Piano settimanale</h2>
         <button
           onClick={handleGenerate}
           disabled={generating}

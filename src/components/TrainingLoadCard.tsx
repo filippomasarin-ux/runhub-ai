@@ -13,13 +13,24 @@ export function TrainingLoadCard({ attivita }: { attivita: AttivitaForAnalytics[
   const dati = carico.storia.slice(-42);
 
   return (
-    <section className="rounded-2xl bg-surface p-5 shadow-card">
-      <div className="mb-1 flex items-center justify-between">
-        <h2 className="text-base font-semibold">Carico di allenamento</h2>
+    <section
+      className="rounded-2xl p-5"
+      style={{
+        background: "oklch(0.115 0.025 295)",
+        boxShadow: "0 1px 0 oklch(1 0 0 / 5%) inset, 0 8px 24px oklch(0 0 0 / 40%)",
+      }}
+    >
+      <div className="mb-0.5 flex items-center justify-between">
+        <h2
+          className="text-sm font-semibold uppercase tracking-wider"
+          style={{ color: "oklch(0.6 0.02 290)" }}
+        >
+          Carico di allenamento
+        </h2>
       </div>
-      <p className="mb-4 text-xs text-muted-foreground">Ultimi 42 giorni · modello CTL/ATL/TSB</p>
+      <p className="mb-4 text-xs" style={{ color: "oklch(0.47 0.02 290)" }}>Ultimi 42 giorni · modello CTL/ATL/TSB</p>
 
-      <div className="grid grid-cols-3 gap-3 border-b border-border pb-4">
+      <div className="grid grid-cols-3 gap-3 border-b pb-4" style={{ borderColor: "oklch(1 0 0 / 7%)" }}>
         <Metric label="CTL" sub="Media 42gg" value={carico.ctl.toFixed(0)} color={CTL_COLOR} />
         <Metric label="ATL" sub="Media 7gg" value={carico.atl.toFixed(0)} color={ATL_COLOR} />
         <div>
@@ -71,9 +82,9 @@ export function TrainingLoadCard({ attivita }: { attivita: AttivitaForAnalytics[
 function Metric({ label, sub, value, color }: { label: string; sub: string; value: string; color: string }) {
   return (
     <div title={sub}>
-      <p className="label-caps text-muted-foreground">{label}</p>
-      <p className="mt-1 text-xl font-semibold tabular-nums" style={{ color }}>{value}</p>
-      <p className="text-[10px] text-muted-foreground">{sub}</p>
+      <p className="label-caps" style={{ color: "oklch(0.5 0.02 290)" }}>{label}</p>
+      <p className="mt-1 text-2xl font-black tabular-nums tracking-tight" style={{ color }}>{value}</p>
+      <p className="text-[10px]" style={{ color: "oklch(0.47 0.02 290)" }}>{sub}</p>
     </div>
   );
 }
