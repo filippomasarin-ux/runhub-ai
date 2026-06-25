@@ -177,98 +177,125 @@ function AuthPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12">
+    <div className="relative min-h-screen overflow-hidden bg-background">
       {/* Ambient background */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div
-          className="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full"
+          className="absolute -top-40 left-1/4 h-[600px] w-[600px] -translate-x-1/2 rounded-full"
           style={{
-            background: "radial-gradient(circle, oklch(0.66 0.28 295 / 16%) 0%, transparent 65%)",
+            background: "radial-gradient(circle, oklch(0.66 0.28 295 / 18%) 0%, transparent 65%)",
             animation: "breathe 9s ease-in-out infinite",
           }}
         />
         <div
-          className="absolute -bottom-20 -right-20 h-72 w-72 rounded-full"
+          className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full"
           style={{
-            background: "radial-gradient(circle, oklch(0.62 0.21 25 / 10%) 0%, transparent 65%)",
+            background: "radial-gradient(circle, oklch(0.62 0.21 25 / 12%) 0%, transparent 65%)",
             animation: "breathe 7s 2s ease-in-out infinite",
           }}
         />
       </div>
 
-      <div className="relative w-full max-w-sm" style={{ animation: "fade-up 0.45s cubic-bezier(0.16,1,0.3,1) both" }}>
-        {/* Logo + tagline */}
-        <div className="mb-8 flex flex-col items-center gap-3 text-center">
+      <div className="relative mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 lg:grid-cols-2">
+        {/* ─── Left: Branding ─────────────────────── */}
+        <div className="hidden flex-col justify-between px-10 py-12 lg:flex xl:px-16">
           <Logo />
-          <p className="text-sm" style={{ color: "oklch(0.5 0.02 290)" }}>
-            Il tuo coach personale, sempre con te.
+          <div style={{ animation: "fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both" }}>
+            <h1 className="font-display text-5xl tracking-wider uppercase xl:text-6xl">
+              Il tuo coach<br />
+              <span style={{
+                background: "linear-gradient(120deg, oklch(0.78 0.22 295), oklch(0.66 0.28 295))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}>personale</span>,<br />
+              sempre con te.
+            </h1>
+            <p className="mt-6 max-w-md text-base leading-relaxed" style={{ color: "oklch(0.55 0.02 290)" }}>
+              Piani settimanali generati dall'AI, analisi avanzate del carico e una community di atleti per spingerti sempre più in alto.
+            </p>
+          </div>
+          <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "oklch(0.4 0.015 290)" }}>
+            RunHub AI · v1.0
           </p>
         </div>
 
-        {/* Card */}
-        <div
-          className="rounded-2xl p-7"
-          style={{
-            background: "oklch(0.10 0.022 295)",
-            border: "1px solid oklch(1 0 0 / 7%)",
-            boxShadow: "0 1px 0 oklch(1 0 0 / 5%) inset, 0 24px 60px oklch(0 0 0 / 50%)",
-          }}
-        >
-          {/* Tab switcher */}
-          <div
-            className="mb-6 flex rounded-xl p-1"
-            style={{ background: "oklch(0.07 0.015 295)" }}
-          >
-            {(["login", "signup"] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMode(m)}
-                className="flex-1 rounded-lg py-2 text-sm font-semibold transition-all duration-150"
-                style={
-                  mode === m
-                    ? { background: "oklch(0.115 0.025 295)", color: "var(--color-foreground)", boxShadow: "0 1px 3px oklch(0 0 0 / 40%)" }
-                    : { color: "oklch(0.5 0.02 290)" }
-                }
-              >
-                {m === "login" ? "Accedi" : "Registrati"}
-              </button>
-            ))}
-          </div>
+        {/* ─── Right: Form ────────────────────────── */}
+        <div className="flex items-center justify-center px-4 py-12 sm:px-8">
+          <div className="w-full max-w-sm" style={{ animation: "fade-up 0.45s cubic-bezier(0.16,1,0.3,1) both" }}>
+            {/* Mobile-only logo */}
+            <div className="mb-8 flex flex-col items-center gap-3 text-center lg:hidden">
+              <Logo />
+              <p className="text-sm" style={{ color: "oklch(0.5 0.02 290)" }}>
+                Il tuo coach personale, sempre con te.
+              </p>
+            </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "signup" && (
-              <Field label="Nome" type="text" required value={nome} onChange={setNome} placeholder="Come ti chiami?" />
-            )}
-            <Field label="Email" type="email" required autoComplete="email" value={email} onChange={setEmail} placeholder="tu@example.com" />
-            <Field
-              label="Password"
-              type="password"
-              required
-              minLength={6}
-              autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              value={password}
-              onChange={setPassword}
-              placeholder="Almeno 6 caratteri"
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 w-full rounded-xl py-3 text-sm font-bold tracking-wide text-white transition-all duration-150 hover:brightness-110 disabled:opacity-50"
+            {/* Card */}
+            <div
+              className="rounded-2xl p-7"
               style={{
-                background: "oklch(0.66 0.28 295)",
-                boxShadow: "0 0 0 1px oklch(0.66 0.28 295 / 40%), 0 4px 20px oklch(0.66 0.28 295 / 35%)",
+                background: "oklch(0.10 0.022 295)",
+                border: "1px solid oklch(1 0 0 / 7%)",
+                boxShadow: "0 1px 0 oklch(1 0 0 / 5%) inset, 0 24px 60px oklch(0 0 0 / 50%)",
               }}
             >
-              {loading ? "Attendi…" : mode === "signup" ? "Crea account" : "Accedi"}
-            </button>
-          </form>
-        </div>
+              {/* Tab switcher */}
+              <div
+                className="mb-6 flex rounded-xl p-1"
+                style={{ background: "oklch(0.07 0.015 295)" }}
+              >
+                {(["login", "signup"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setMode(m)}
+                    className="flex-1 rounded-lg py-2 text-sm font-semibold transition-all duration-150"
+                    style={
+                      mode === m
+                        ? { background: "oklch(0.115 0.025 295)", color: "var(--color-foreground)", boxShadow: "0 1px 3px oklch(0 0 0 / 40%)" }
+                        : { color: "oklch(0.5 0.02 290)" }
+                    }
+                  >
+                    {m === "login" ? "Accedi" : "Registrati"}
+                  </button>
+                ))}
+              </div>
 
-        <p className="mt-5 text-center text-xs" style={{ color: "oklch(0.4 0.015 290)" }}>
-          Continuando accetti i termini di servizio di RunHub AI.
-        </p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {mode === "signup" && (
+                  <Field label="Nome" type="text" required value={nome} onChange={setNome} placeholder="Come ti chiami?" />
+                )}
+                <Field label="Email" type="email" required autoComplete="email" value={email} onChange={setEmail} placeholder="tu@example.com" />
+                <Field
+                  label="Password"
+                  type="password"
+                  required
+                  minLength={6}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                  value={password}
+                  onChange={setPassword}
+                  placeholder="Almeno 6 caratteri"
+                />
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-2 w-full rounded-xl py-3 text-sm font-bold tracking-wide text-white transition-all duration-150 hover:brightness-110 disabled:opacity-50"
+                  style={{
+                    background: "oklch(0.66 0.28 295)",
+                    boxShadow: "0 0 0 1px oklch(0.66 0.28 295 / 40%), 0 4px 20px oklch(0.66 0.28 295 / 35%)",
+                  }}
+                >
+                  {loading ? "Attendi…" : mode === "signup" ? "Crea account" : "Accedi"}
+                </button>
+              </form>
+            </div>
+
+            <p className="mt-5 text-center text-xs" style={{ color: "oklch(0.4 0.015 290)" }}>
+              Continuando accetti i termini di servizio di RunHub AI.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

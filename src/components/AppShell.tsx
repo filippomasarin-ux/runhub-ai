@@ -75,7 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main */}
-      <main className="mx-auto max-w-xl px-4 md:px-6">{children}</main>
+      <main className="w-full px-4 md:px-8 lg:px-10">{children}</main>
 
       {/* Mobile bottom nav */}
       <nav
