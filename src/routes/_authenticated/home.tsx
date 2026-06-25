@@ -18,6 +18,8 @@ import { AddActivityDialog } from "@/components/AddActivityDialog";
 import { toast } from "sonner";
 import { getAttivitaAnalytics } from "@/lib/attivita.functions";
 import type { AttivitaForAnalytics } from "@/lib/analytics";
+import { useActiveSports } from "@/hooks/useActiveSports";
+import { SportFilterBar } from "@/components/SportFilterBar";
 
 export const Route = createFileRoute("/_authenticated/home")({
   ssr: false,
