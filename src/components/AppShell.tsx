@@ -3,13 +3,20 @@ import { Home, Play, MessageCircle, BarChart3, User } from "lucide-react";
 import type { ReactNode } from "react";
 import { Logo } from "./Logo";
 
-const tabs = [
+type Tab = {
+  to: "/home" | "/inizia" | "/coach" | "/stats" | "/profilo";
+  label: string;
+  icon: typeof Home;
+  highlight?: boolean;
+};
+
+const tabs: Tab[] = [
   { to: "/home", label: "Home", icon: Home },
   { to: "/inizia", label: "Inizia", icon: Play, highlight: true },
   { to: "/coach", label: "Coach", icon: MessageCircle },
   { to: "/stats", label: "Stats", icon: BarChart3 },
   { to: "/profilo", label: "Profilo", icon: User },
-] as const;
+];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
