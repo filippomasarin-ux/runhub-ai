@@ -18,12 +18,30 @@ type FormState = {
   sport_primario: SportKey | "";
   obiettivi: string[];
   obiettivo_dettaglio: string;
+  pesi: Record<string, number>;
+  volume_target: Record<string, number>;
   giorni_disponibili: string[];
   giorni_count: number;
   limitazioni_fisiche: string;
 };
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
+const DEFAULT_VOLUME = 60;
+
+function fmtMin(m: number): string {
+  if (m < 60) return `${m}min`;
+  const h = Math.floor(m / 60);
+  const rem = m % 60;
+  return rem > 0 ? `${h}h ${rem}min` : `${h}h`;
+}
+
+function normalizeWeights(keys: string[], pesi: Record<string, number>): Record<string, number> {
+  if (keys.length === 0) return {};
+  if (keys.length === 1) return { [keys[0]]: 100 };
+  const total = keys.reduce((s, k) => s + (pesi[k] ?? 50), 0);
+  if (total === 0) return Object.fromEntries(keys.map((k) => [k, Math.round(100 / keys.length)]));
+  return Object.fromEntries(keys.map((k) => [k, Math.round(((pesi[k] ?? 50) / total) * 100)]));
+}
 
 function OnboardingPage() {
   const navigate = useNavigate();
@@ -38,6 +56,8 @@ function OnboardingPage() {
     sport_primario: "",
     obiettivi: [],
     obiettivo_dettaglio: "",
+    pesi: {},
+    volume_target: {},
     giorni_disponibili: [],
     giorni_count: 3,
     limitazioni_fisiche: "",
@@ -69,7 +89,10 @@ function OnboardingPage() {
       const has = f.sport_secondari.includes(s);
       const next = has ? f.sport_secondari.filter((x) => x !== s) : [...f.sport_secondari, s];
       const primario = next.includes(f.sport_primario as SportKey) ? f.sport_primario : (next[0] ?? "");
-      return { ...f, sport_secondari: next, sport_primario: primario };
+      const volume_target = { ...f.volume_target };
+      if (has) delete volume_target[s];
+      else volume_target[s] = DEFAULT_VOLUME;
+      return { ...f, sport_secondari: next, sport_primario: primario, volume_target };
     });
   };
 
@@ -83,12 +106,22 @@ function OnboardingPage() {
   };
 
   const toggleObiettivo = (key: string) => {
-    setForm((f) => ({
-      ...f,
-      obiettivi: f.obiettivi.includes(key)
-        ? f.obiettivi.filter((x) => x !== key)
-        : [...f.obiettivi, key],
-    }));
+    setForm((f) => {
+      const has = f.obiettivi.includes(key);
+      const next = has ? f.obiettivi.filter((x) => x !== key) : [...f.obiettivi, key];
+      const pesi = { ...f.pesi };
+      if (!has) pesi[key] = 50;
+      else delete pesi[key];
+      return { ...f, obiettivi: next, pesi };
+    });
+  };
+
+  const updatePeso = (key: string, value: number) => {
+    setForm((f) => ({ ...f, pesi: { ...f.pesi, [key]: value } }));
+  };
+
+  const updateVolume = (sport: string, value: number) => {
+    setForm((f) => ({ ...f, volume_target: { ...f.volume_target, [sport]: value } }));
   };
 
   const canNext = (() => {
@@ -99,13 +132,16 @@ function OnboardingPage() {
       if (form.obiettivi.includes("gara")) return form.obiettivo_dettaglio.trim().length > 0;
       return true;
     }
-    if (step === 4) return form.giorni_disponibili.length > 0;
+    if (step === 4) return true;
+    if (step === 5) return form.giorni_disponibili.length > 0;
     return true;
   })();
 
   const handleComplete = async () => {
     if (!userId) return;
     setSaving(true);
+    const normalized = normalizeWeights(form.obiettivi, form.pesi);
+    const obiettivi_pesati = form.obiettivi.map((k) => ({ key: k, peso: normalized[k] ?? 0 }));
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -117,6 +153,8 @@ function OnboardingPage() {
         obiettivo_tipo: form.obiettivi[0] ?? null,
         obiettivi: form.obiettivi,
         obiettivo_dettaglio: form.obiettivo_dettaglio || null,
+        volume_target: form.volume_target,
+        obiettivi_pesati,
         giorni_disponibili: form.giorni_disponibili,
         limitazioni_fisiche: form.limitazioni_fisiche || null,
         onboarding_completato: true,
@@ -130,6 +168,8 @@ function OnboardingPage() {
     toast.success("Pronto, sei dentro!");
     navigate({ to: "/home" });
   };
+
+  const normalized = normalizeWeights(form.obiettivi, form.pesi);
 
   return (
     <div className="min-h-screen bg-background">
@@ -241,11 +281,9 @@ function OnboardingPage() {
         {step === 3 && (
           <section className="space-y-6">
             <div>
-              <h1 className="text-2xl">Il tuo obiettivo</h1>
-              <p className="mt-1 text-sm text-muted-foreground">Cosa vuoi raggiungere con RunHub AI?</p>
+              <h1 className="text-2xl">I tuoi obiettivi</h1>
+              <p className="mt-1 text-sm text-muted-foreground">Cosa vuoi raggiungere? Puoi selezionarne più di uno.</p>
             </div>
-
-            <p className="text-xs text-muted-foreground">Puoi selezionarne più di uno.</p>
 
             <div className="space-y-3">
               {OBIETTIVI.map((o) => {
@@ -285,10 +323,96 @@ function OnboardingPage() {
                 />
               </Field>
             )}
+
+            {form.obiettivi.length > 1 && (
+              <div className="rounded-xl border border-border bg-surface p-5">
+                <p className="label-caps mb-1 text-muted-foreground">Bilanciamento del focus</p>
+                <p className="mb-4 text-xs text-muted-foreground">Distribuisci la tua energia tra gli obiettivi.</p>
+                <div className="space-y-4">
+                  {form.obiettivi.map((key) => {
+                    const o = OBIETTIVI.find((x) => x.key === key)!;
+                    const Icon = o.icon;
+                    const pct = normalized[key] ?? 0;
+                    return (
+                      <div key={key}>
+                        <div className="mb-1.5 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4" style={{ color: "var(--color-accent)" }} strokeWidth={1.8} />
+                            <span className="text-sm font-medium">{o.titolo}</span>
+                          </div>
+                          <span
+                            className="rounded-full px-2 py-0.5 text-xs font-bold tabular-nums"
+                            style={{ backgroundColor: "var(--color-accent)", color: "var(--color-accent-foreground)" }}
+                          >
+                            {pct}%
+                          </span>
+                        </div>
+                        <input
+                          type="range" min={10} max={90} step={5}
+                          value={form.pesi[key] ?? 50}
+                          onChange={(e) => updatePeso(key, Number(e.target.value))}
+                          className="w-full accent-[var(--color-accent)]"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </section>
         )}
 
         {step === 4 && (
+          <section className="space-y-6">
+            <div>
+              <h1 className="text-2xl">Volume settimanale</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Quanto tempo vuoi dedicare a ogni sport? Il Coach AI bilancerà il piano in base a questi target.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {form.sport_secondari.map((k) => {
+                const s = SPORTS.find((x) => x.key === k)!;
+                const Icon = s.icon;
+                const vol = form.volume_target[k] ?? DEFAULT_VOLUME;
+                return (
+                  <div key={k} className="rounded-xl border border-border bg-surface p-5">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className="flex h-9 w-9 items-center justify-center rounded-lg"
+                          style={{ backgroundColor: `color-mix(in oklch, ${s.color} 15%, transparent)`, color: s.color }}
+                        >
+                          <Icon className="h-4 w-4" strokeWidth={2} />
+                        </span>
+                        <span className="font-semibold">{s.label}</span>
+                      </div>
+                      <span className="text-xl font-black tabular-nums tracking-tight" style={{ color: s.color }}>
+                        {fmtMin(vol)}
+                      </span>
+                    </div>
+                    <input
+                      type="range" min={30} max={600} step={15}
+                      value={vol}
+                      onChange={(e) => updateVolume(k, Number(e.target.value))}
+                      className="w-full"
+                      style={{ accentColor: s.color }}
+                    />
+                    <div className="mt-1.5 flex justify-between text-[10px] text-muted-foreground">
+                      <span>30min</span>
+                      <span>2h</span>
+                      <span>5h</span>
+                      <span>10h</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {step === 5 && (
           <section className="space-y-6">
             <div>
               <h1 className="text-2xl">La tua disponibilità</h1>
@@ -341,7 +465,7 @@ function OnboardingPage() {
           </section>
         )}
 
-        {step === 5 && (
+        {step === 6 && (
           <section className="space-y-6">
             <div>
               <h1 className="text-2xl">Tutto pronto</h1>
@@ -358,14 +482,33 @@ function OnboardingPage() {
               </p>
             </div>
 
-            <div className="rounded-xl bg-[oklch(0.97_0.02_175)] p-5 text-sm">
+            <div className="rounded-xl bg-surface p-5 text-sm">
               <div className="font-semibold text-foreground">Benvenuto, {form.nome.split(" ")[0] || "atleta"}.</div>
-              <p className="mt-1 text-muted-foreground">
-                Hai impostato {form.giorni_count} giorni di allenamento con{" "}
-                {form.obiettivi.length === 1
-                  ? OBIETTIVI.find((o) => o.key === form.obiettivi[0])?.titolo.toLowerCase()
-                  : `${form.obiettivi.length} obiettivi`}{" "}come focus principale.
-              </p>
+              <div className="mt-3 space-y-1.5 text-muted-foreground">
+                <p>
+                  <span className="font-medium text-foreground">{form.sport_secondari.length}</span> sport · {form.giorni_count} giorni/settimana
+                </p>
+                <p>
+                  {form.obiettivi.length === 1
+                    ? OBIETTIVI.find((o) => o.key === form.obiettivi[0])?.titolo
+                    : `${form.obiettivi.length} obiettivi bilanciati`}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {form.sport_secondari.map((k) => {
+                    const s = SPORTS.find((x) => x.key === k)!;
+                    const vol = form.volume_target[k] ?? DEFAULT_VOLUME;
+                    return (
+                      <span
+                        key={k}
+                        className="rounded-full px-2.5 py-0.5 text-xs font-medium"
+                        style={{ backgroundColor: `color-mix(in oklch, ${s.color} 14%, transparent)`, color: s.color }}
+                      >
+                        {s.label} · {fmtMin(vol)}/sett
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </section>
         )}
