@@ -108,6 +108,56 @@ export type Database = {
           },
         ]
       }
+      club_eventi: {
+        Row: {
+          club_id: string
+          created_at: string
+          created_by: string | null
+          data: string
+          descrizione: string | null
+          id: string
+          luogo: string | null
+          max_partecipanti: number | null
+          sport: string | null
+          titolo: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          created_by?: string | null
+          data: string
+          descrizione?: string | null
+          id?: string
+          luogo?: string | null
+          max_partecipanti?: number | null
+          sport?: string | null
+          titolo: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          descrizione?: string | null
+          id?: string
+          luogo?: string | null
+          max_partecipanti?: number | null
+          sport?: string | null
+          titolo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_eventi_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_members: {
         Row: {
           club_id: string
@@ -140,6 +190,73 @@ export type Database = {
           },
         ]
       }
+      club_messaggi: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          testo: string
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          testo: string
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          testo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_messaggi_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_partecipazioni: {
+        Row: {
+          created_at: string
+          evento_id: string
+          id: string
+          stato: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          evento_id: string
+          id?: string
+          stato?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          evento_id?: string
+          id?: string
+          stato?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_partecipazioni_evento_id_fkey"
+            columns: ["evento_id"]
+            isOneToOne: false
+            referencedRelation: "club_eventi"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clubs: {
         Row: {
           codice_invito: string
@@ -148,6 +265,7 @@ export type Database = {
           descrizione: string | null
           id: string
           nome: string
+          sport: string[] | null
           updated_at: string
         }
         Insert: {
@@ -157,6 +275,7 @@ export type Database = {
           descrizione?: string | null
           id?: string
           nome: string
+          sport?: string[] | null
           updated_at?: string
         }
         Update: {
@@ -166,6 +285,7 @@ export type Database = {
           descrizione?: string | null
           id?: string
           nome?: string
+          sport?: string[] | null
           updated_at?: string
         }
         Relationships: []
