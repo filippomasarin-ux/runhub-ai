@@ -367,8 +367,9 @@ function HeroWorkoutCard({
 }) {
   return (
     <div
-      className="relative overflow-hidden rounded-3xl p-6"
+      className="relative overflow-hidden"
       style={{
+        borderRadius: 24,
         background: `linear-gradient(155deg, ${sportColor}22 0%, #111111 55%, #0F0F0F 100%)`,
         border: `1px solid ${sportColor}40`,
       }}
@@ -379,46 +380,52 @@ function HeroWorkoutCard({
         style={{ background: sportColor, filter: "blur(80px)", opacity: 0.35 }}
       />
 
-      <div className="relative">
-        <div className="flex items-center gap-2">
-          <span className="label-caps" style={{ color: sportColor }}>Prossimo · {sportLabel}</span>
-          <span className="label-caps rounded px-1.5 py-0.5" style={{ background: "#1A1A1A", color: "#FFFFFF" }}>
-            AI
+      <div className="relative px-6 pt-6 pb-0">
+        <div className="flex items-center gap-2" style={{ paddingLeft: 4 }}>
+          <span className="label-caps truncate" style={{ color: sportColor }}>
+            Prossimo · {sportLabel} · AI
           </span>
         </div>
 
-        <h2 className="mt-3 font-display text-4xl tracking-wider uppercase text-white">
+        <h2
+          className="mt-3 font-display text-3xl tracking-wider uppercase text-white sm:text-4xl"
+          style={{ paddingLeft: 4, paddingRight: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+        >
           {workout.tipo}
         </h2>
-        <p className="mt-1.5 text-sm" style={mutedText}>{workout.note}</p>
+        <p className="mt-1.5 text-sm" style={{ ...mutedText, paddingLeft: 4, paddingRight: 4 }}>
+          {workout.note}
+        </p>
 
         <div className="mt-5 grid grid-cols-3 gap-3">
           <Metric label="Durata" value={`${workout.durata}′`} />
           <Metric label="Volume" value={workout.volume} />
           <Metric label="Effort" value={`${workout.rpe}/10`} accent={sportColor} />
         </div>
+      </div>
 
-        {/* Effort bar */}
-        <div className="mt-3">
-          <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "#1A1A1A" }}>
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: `${workout.rpe * 10}%`,
-                background: `linear-gradient(90deg, ${sportColor}, var(--color-accent-2))`,
-                boxShadow: `0 0 12px ${sportColor}`,
-                transition: "width 0.8s cubic-bezier(0.16,1,0.3,1)",
-              }}
-            />
-          </div>
+      {/* Effort bar */}
+      <div className="mt-4 mx-5">
+        <div className="h-[3px] w-full overflow-hidden rounded-full" style={{ background: "#1A1A1A" }}>
+          <div
+            className="h-full rounded-full"
+            style={{
+              width: `${workout.rpe * 10}%`,
+              background: `linear-gradient(90deg, ${sportColor}, var(--color-accent-2))`,
+              boxShadow: `0 0 12px ${sportColor}`,
+              transition: "width 0.8s cubic-bezier(0.16,1,0.3,1)",
+            }}
+          />
         </div>
+      </div>
 
+      <div className="p-5 pt-4">
         <button
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-white animate-pulse-glow"
-          style={{ background: sportColor }}
+          className="flex w-full items-center justify-center gap-2 text-white animate-pulse-glow"
+          style={{ background: sportColor, height: 56, borderRadius: 16 }}
         >
           <Play size={18} strokeWidth={3} fill="white" />
-          <span className="font-display text-lg tracking-[0.2em] uppercase">Start</span>
+          <span className="font-display text-base tracking-widest font-black uppercase">Start</span>
         </button>
       </div>
     </div>
@@ -427,7 +434,10 @@ function HeroWorkoutCard({
 
 function Metric({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
-    <div className="rounded-xl p-3" style={{ background: "rgba(0,0,0,0.35)", border: "1px solid #1F1F1F" }}>
+    <div
+      className="flex flex-col justify-center rounded-xl px-4 py-3"
+      style={{ background: "rgba(0,0,0,0.35)", border: "1px solid #1F1F1F", minHeight: 72 }}
+    >
       <p className="label-caps" style={mutedText}>{label}</p>
       <p className="metric-num mt-1.5 text-xl" style={{ color: accent ?? "#FFFFFF" }}>{value}</p>
     </div>
