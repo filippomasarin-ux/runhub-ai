@@ -90,31 +90,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           {tabs.map((t) => {
             const active = path === t.to || path.startsWith(t.to + "/");
             const Icon = t.icon;
-            if (t.highlight) {
-              return (
-                <Link
-                  key={t.to}
-                  to={t.to}
-                  className="-mt-5 flex flex-1 flex-col items-center justify-end gap-1"
-                >
-                  <span
-                    className="flex h-14 w-14 items-center justify-center rounded-2xl text-white"
-                    style={{
-                      background: "var(--gradient-hero)",
-                      boxShadow: "0 8px 22px rgba(255, 59, 48, 0.5), 0 0 0 4px #0A0A0A",
-                    }}
-                  >
-                    <Icon size={22} strokeWidth={3} fill="white" />
-                  </span>
-                  <span
-                    className="font-display text-[10px] tracking-[0.18em]"
-                    style={{ color: "#FFFFFF" }}
-                  >
-                    {t.label}
-                  </span>
-                </Link>
-              );
-            }
             return (
               <Link
                 key={t.to}
